@@ -102,7 +102,7 @@ const createDFOChatSession = (
 	// cxone('init', 5290, 'chat_b4bcd98a-d416-466f-9faf-72a057c3fa2e');
 
 	cxone('init', '5290');
-	cxone('chat', 'init', 5290, 'chat_b4bcd98a-d416-466f-9faf-72a057c3fa2e');
+	cxone('chat', 'init', 5290, 'chat_947dc39f-8c5b-471f-9110-cdf79737789e');
 	cxone('chat', 'hidePreSurvey');
 	cxone('chat', 'setCaseCustomField', 'p1', p1);
 	cxone('chat', 'setCaseCustomField', 'p2', p2);

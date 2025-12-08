@@ -97,10 +97,6 @@ const createDFOChatSession = (
 	p8: string,
 	data: ParamProps
 ) => {
-	// Parâmetros para o chat
-	// brandembassy('init', 5290, 'chat_918cf97b-9ad6-4751-b553-93bffc438010');
-	// cxone('init', 5290, 'chat_b4bcd98a-d416-466f-9faf-72a057c3fa2e');
-
 	cxone('init', '5290');
 	cxone('chat', 'init', 5290, 'chat_947dc39f-8c5b-471f-9110-cdf79737789e');
 	cxone('chat', 'hidePreSurvey');
@@ -116,7 +112,6 @@ const createDFOChatSession = (
 
 	// Abre em tela cheia
 	cxone('chat', 'setFullDisplay');
-	cxone('chat', 'allowGameMode');
 
 	// Custom CSS
 	cxone(
@@ -129,8 +124,8 @@ const createDFOChatSession = (
 	cxone('chat', 'showSendButton');
 	//abre janela do chat
 	cxone('chat', 'openChatWindow');
-	//Sessão automatica
-	cxone('chat', 'autoStartSession');
+
+	localStorage.clear();
 
 	cxone(
 		'chat',
@@ -162,15 +157,16 @@ const createDFOChatSession = (
 			if (status === 'closed') {
 				console.log('status closed');
 				localStorage.clear();
+				localStorage.removeItem('cxone:5290:_BECustomerId');
+
 				// TODO: encontrar melhor maneira de finalizar o chat
 				alert(
-					'Thanks for contacting us. We are now redirecting you back to the main form.'
+					`Agradecemos o contato. Em breve voltaremos para o formulário principal.`
 				);
-
-				// setTimeout(() => {
-				window.location.reload();
-				// }, 6000);
 			}
 		}
 	);
+
+	//Sessão automatica
+	cxone('chat', 'autoStartSession');
 };

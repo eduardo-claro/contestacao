@@ -114,11 +114,9 @@ const createDFOChatSession = (
 	cxone('chat', 'setFullDisplay');
 
 	// Custom CSS
-	cxone(
-		'chat',
-		'setCustomCss',
-		'[data-selector="HEADER"] {background: #da291c;} [data-selector="HEADER"] span {height: 60px; overflow: hidden; position: absolute; width: 300px; clip: unset; color: white;} h1 {visibility: hidden;  position: relative;} h1::after { content: url("https://ctigateway.c2x.com.br/ClaroChatV2/img/claro.svg");  visibility: visible;  position: absolute;  left: 0;  top: -8px;} [data-cy="header-minimize-window"] {display: none;} [data-selector="SEND_BUTTON"] {background: #da291c; color: white} [data-selector="TEXTAREA"] {}'
-	);
+	const customCss = `[data-selector="WINDOW"] {left: -15px;padding-left: 15px;} [data-selector="HEADER"] {background: #da291c;} [data-selector="HEADER"] span {height: 60px; overflow: hidden; position: absolute; width: 300px; clip: unset; color: white;} h1 {visibility: hidden;  position: relative;} h1::after { content: url("https://ctigateway.c2x.com.br/ClaroChatV2/img/claro.svg");  visibility: visible;  position: absolute;  left: 0;  top: -8px;} [data-cy="header-minimize-window"] {display: none;} [data-selector="SEND_BUTTON"] {background: #da291c; color: white} [data-selector="TEXTAREA"] {} [data-selector="AGENT_MESSAGE_BUBBLE"] {color: black;} [data-selector="CUSTOMER_MESSAGE_BUBBLE"] {background-color: #da291c !important; color: white !important;}`;
+
+	cxone('chat', 'setCustomCss', customCss);
 
 	// Mostrar botão de enviar
 	cxone('chat', 'showSendButton');

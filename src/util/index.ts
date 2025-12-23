@@ -46,19 +46,27 @@ export const parseToObject = (json: string): ParamProps => {
 	return JSON.parse(json);
 };
 
-export const sendToNice = (data: ParamProps): void => {
-	console.log('Dados: ', data);
+export const sendToNice = (data: ParamProps): Promise<void> => {
+	return new Promise((resolve) => {
+		console.log('Dados: ', data);
 
-	const p1 = data.nome;
-	const p2 = data.email;
-	const p3 = data.telefone;
-	const p4 = data.cpf;
-	const p5 = data.origem;
-	const p6 = data.layout;
-	const p7 = data.token;
-	const p8 = data.segmento;
+		const p1 = data.nome;
+		const p2 = data.email;
+		const p3 = data.telefone;
+		const p4 = data.cpf;
+		const p5 = data.origem;
+		const p6 = data.layout;
+		const p7 = data.token;
+		const p8 = data.segmento;
 
-	createDFOChatSession(p1, p2, p3, p4, p5, p6, p7, p8, data);
+		createDFOChatSession(p1, p2, p3, p4, p5, p6, p7, p8, data, resolve);
+	});
+};
+
+export const reloadWithoutParam = () => {
+	const url = new URL(window.location.href);
+	url.searchParams.delete('p');
+	window.history.replaceState({}, '', url.pathname + url.search);
 };
 
 /**
@@ -95,9 +103,14 @@ const createDFOChatSession = (
 	p6: string,
 	p7: string,
 	p8: string,
-	data: ParamProps
+	data: ParamProps,
+	onFinish: () => void
 ) => {
+	// Tenta destruir qualquer sessão residual antes de iniciar a nova
+	const sessionId = Date.now().toString();
+
 	cxone('init', '5290');
+	cxone('chat', 'setCustomerId', sessionId);
 	cxone('chat', 'init', 5290, 'chat_947dc39f-8c5b-471f-9110-cdf79737789e');
 	cxone('chat', 'hidePreSurvey');
 	cxone('chat', 'setCaseCustomField', 'p1', p1);
@@ -110,18 +123,24 @@ const createDFOChatSession = (
 	cxone('chat', 'setCaseCustomField', 'p8', p8);
 	cxone('chat', 'setCustomerName', data.nome);
 
-	// Abre em tela cheia
-	cxone('chat', 'setFullDisplay');
-
 	// Custom CSS
-	const customCss = `[data-selector="WINDOW"] {left: -15px;padding-left: 15px;} [data-selector="HEADER"] {background: #da291c;} [data-selector="HEADER"] span {height: 60px; overflow: hidden; position: absolute; width: 300px; clip: unset; color: white;} h1 {visibility: hidden;  position: relative;} h1::after { content: url("https://ctigateway.c2x.com.br/ClaroChatV2/img/claro.svg");  visibility: visible;  position: absolute;  left: 0;  top: -8px;} [data-cy="header-minimize-window"] {display: none;} [data-selector="SEND_BUTTON"] {background: #da291c; color: white} [data-selector="TEXTAREA"] {} [data-selector="AGENT_MESSAGE_BUBBLE"] {color: black;} [data-selector="CUSTOMER_MESSAGE_BUBBLE"] {background-color: #da291c !important; color: white !important;}`;
-
+	const customCss = `
+		[data-selector="HEADER"] {background: #da291c; color: white;} 
+		[data-selector="HEADER"] span {height: 60px; overflow: hidden; position: absolute; width: 300px; clip: unset; color: white;} h1 {visibility: hidden;  position: relative;} h1::after { content: url("https://ctigateway.c2x.com.br/ClaroChatV2/img/claro.svg");  visibility: visible;  position: absolute;  left: 0;  top: -8px;} [data-cy="HEADER-MINIMIZE-WINDOW"] {display: none;} 
+		[data-selector="SEND_BUTTON"] {background: #da291c; color: white} 
+		[data-selector="TEXTAREA"] {} 
+		[data-selector="AGENT_MESSAGE_BUBBLE"] {color: black;} 
+		[data-selector="CUSTOMER_MESSAGE_BUBBLE"] {background-color: #da291c !important; color: white !important;}`;
 	cxone('chat', 'setCustomCss', customCss);
 
 	// Mostrar botão de enviar
-	cxone('chat', 'showSendButton');
+	cxone('chat', 'showSendButton', 'true');
 	//abre janela do chat
-	cxone('chat', 'openChatWindow');
+	cxone('chat', 'openChatWindow', 'true');
+	// Reseta a posição do chat para a esquerda, deixando a tela cheia
+	cxone('chat', 'setPositionX', 'left');
+	// Abre em tela cheia
+	cxone('chat', 'setFullDisplay', 'true');
 
 	localStorage.clear();
 
@@ -156,11 +175,14 @@ const createDFOChatSession = (
 				console.log('status closed');
 				localStorage.clear();
 				localStorage.removeItem('cxone:5290:_BECustomerId');
+				onFinish();
 
-				// TODO: encontrar melhor maneira de finalizar o chat
-				alert(
-					`Agradecemos o contato. Em breve voltaremos para o formulário principal.`
-				);
+				cxone('chat', 'hideChatWindow', 'true');
+
+				const closeCSS = `
+					[data-selector="WIDGET"] {display: none;}
+				`;
+				cxone('chat', 'setCustomCss', closeCSS);
 			}
 		}
 	);

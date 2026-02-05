@@ -2,8 +2,12 @@ import { Heading, Spinner, Text } from 'mondrian-react';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import type { ParamProps } from './types';
-import { reloadWithoutParam, sendToNice } from './util';
+import {
+	formataDecriptografa,
+	parseToObject,
+	reloadWithoutParam,
+	sendToNice,
+} from './util';
 
 function App() {
 	const [searchParams] = useSearchParams();
@@ -12,8 +16,12 @@ function App() {
 
 	const [mensagem] = useState<string>('Agradecemos o contato.');
 	const [showSubMessage, setShowSubMessage] = useState<boolean>(false);
-	const [subMessage] = useState<string>('Nenhum dado encontrado, por favor verifique a URL e tente novamente.');
-	const [closeWindowMessage] = useState<string>('Você já pode fechar esta janela.');
+	const [subMessage] = useState<string>(
+		'Nenhum dado encontrado, por favor verifique a URL e tente novamente.',
+	);
+	const [closeWindowMessage] = useState<string>(
+		'Você já pode fechar esta janela.',
+	);
 
 	const hasProcessed = useRef(false);
 
@@ -22,9 +30,12 @@ function App() {
 			// 1. Caso não tenha parâmetro
 			if (!parameter) {
 				if (!hasProcessed.current) {
-					toast.error('Nenhum dado encontrado, por favor verifique a URL e tente novamente.', {
-						duration: 10000,
-					});
+					toast.error(
+						'Nenhum dado encontrado, por favor verifique a URL e tente novamente.',
+						{
+							duration: 10000,
+						},
+					);
 					setShowSubMessage(true);
 					setLoading(false);
 				}
@@ -36,9 +47,8 @@ function App() {
 			hasProcessed.current = true;
 
 			try {
-				const obj = Object.fromEntries(
-					new URLSearchParams(atob(parameter)).entries()
-				) as ParamProps;
+				const dados = formataDecriptografa(parameter);
+				const obj = parseToObject(dados);
 
 				// Executa a função de envio (Nice/DFO)
 				await sendToNice(obj);
@@ -53,57 +63,6 @@ function App() {
 		};
 
 		processarEnvio();
-
-		// if (!parameter) {
-		// 	toast.error(
-		// 		'Nenhum dado encontrado, por favor verifique a URL e tente novamente.',
-		// 		{
-		// 			duration: 10000,
-		// 		}
-		// 	);
-		// 	return;
-		// }
-
-		// const obj = Object.fromEntries(
-		// 	new URLSearchParams(atob(parameter)).entries()
-		// ) as ParamProps;
-
-		// sendToNice(obj);
-
-		// const convertToObject = (json: string): void => {
-		// 	if (!json) {
-		// 		return;
-		// 	}
-		// 	const obj: ParamProps = parseToObject(json);
-		// 	sendToNice(obj);
-		// };
-
-		// try {
-		// const json = formataDecriptografa(parameter!);
-		// convertToObject(json);
-		// } catch (error) {
-		// toast.error(`Erro ao descriptografar o dado. ${error}`, {
-		// duration: 10000,
-		// });
-		// }
-		// }
-
-		// const convertToObject = (json: string): void => {
-		// 	if (!json) {
-		// 		return;
-		// 	}
-		// 	const obj: ParamProps = parseToObject(json);
-		// 	sendToNice(obj);
-		// };
-
-		// try {
-		// const json = formataDecriptografa(parameter!);
-		// convertToObject(json);
-		// } catch (error) {
-		// toast.error(`Erro ao descriptografar o dado. ${error}`, {
-		// duration: 10000,
-		// });
-		// }
 	}, [parameter]);
 
 	return (
@@ -117,7 +76,9 @@ function App() {
 							{mensagem}
 						</Heading>
 						{showSubMessage && (
-							<Text inverse sm>{subMessage}</Text>
+							<Text inverse sm>
+								{subMessage}
+							</Text>
 						)}
 						<Text inverse sm>
 							{closeWindowMessage}

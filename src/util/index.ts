@@ -16,7 +16,7 @@ export function formataDecriptografa(infoCriptografada: string): string {
 	});
 
 	const result = decrypted.toString(CryptoJS.enc.Utf8);
-	return JSON.parse(result);
+	return result;
 }
 
 export function formataCriptografa(info: unknown): string {
@@ -48,8 +48,6 @@ export const parseToObject = (json: string): ParamProps => {
 
 export const sendToNice = (data: ParamProps): Promise<void> => {
 	return new Promise((resolve) => {
-		console.log('Dados: ', data);
-
 		const p1 = data.nome;
 		const p2 = data.email;
 		const p3 = data.telefone;
@@ -59,7 +57,8 @@ export const sendToNice = (data: ParamProps): Promise<void> => {
 		const p7 = data.token;
 		const p8 = data.segmento;
 
-		createDFOChatSession(p1, p2, p3, p4, p5, p6, p7, p8, data, resolve);
+		console.log('Dados: ', p1, p2, p3, p4, p5, p6, p7, p8, data);
+		// createDFOChatSession(p1, p2, p3, p4, p5, p6, p7, p8, data, resolve);
 	});
 };
 
@@ -104,7 +103,7 @@ const createDFOChatSession = (
 	p7: string,
 	p8: string,
 	data: ParamProps,
-	onFinish: () => void
+	onFinish: () => void,
 ) => {
 	// Tenta destruir qualquer sessão residual antes de iniciar a nova
 	const sessionId = Date.now().toString();
@@ -147,7 +146,7 @@ const createDFOChatSession = (
 	cxone(
 		'chat',
 		'sendFirstMessageAutomatically',
-		'Olá, meu nome é ' + data.nome
+		'Olá, meu nome é ' + data.nome,
 	);
 	cxone('chat', 'hideFirstSentMessage', true);
 
@@ -184,7 +183,7 @@ const createDFOChatSession = (
 				`;
 				cxone('chat', 'setCustomCss', closeCSS);
 			}
-		}
+		},
 	);
 
 	//Sessão automatica
